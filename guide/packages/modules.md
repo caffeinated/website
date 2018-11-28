@@ -207,3 +207,60 @@ public function boot()
     ]);
 }
 ```
+
+## Locations
+You may configure as many locations for your modules as necessary. This is especially useful if you want to split up your "core" modules from optional "add-on" modules as an example.
+
+The location configuration is found in the `config/modules.php` file under "locations". Here you may customize locations as needed.
+
+By default, the package is configured to store and reference modules from the `app/Modules` directory.
+
+## Helpers
+Caffeinated Modules includes a handful of global "helper" PHP functions. These are used by the package itself; however, you are free to use them in your own code if you find them convenient.
+
+---
+
+<div class="collection-method-list">
+
+[modules](#modules-2)
+[module_path](#module-path)
+[module_class](#module-class)
+
+</div>
+
+---
+
+### modules
+The `modules` function returns a collection of all modules and their accompanying manifest information.
+
+```php
+$modules = modules();
+```
+
+### module_path
+The `module_path` function returns the fully qualified path to the specified module's directory. You may also use the `module_path` function to generate a fully qualified path to a file relative to the module:
+
+```php
+$path = module_path('blog');
+
+$path = module_path('blog', 'Http/Controllers/BlogController.php');
+```
+
+If your module is not found within your configured default location, you may pass a third option to specify the location:
+
+```php
+$path = module_path('blog', 'Http/Controllers/BlogController.php', 'add-on');
+```
+
+### module_class
+The `module_class` function returns the full namespace path of the specified module and class.
+
+```php
+$namespace = module_class('blog', 'Http\Controllers\BlogController');
+```
+
+If your module is not found within your configured default location, you may pass a third option to specify the location:
+
+```php
+$namespace = module_class('blog', 'Http\Controllers\BlogController', 'add-on');
+```
