@@ -26,6 +26,7 @@ module.exports = {
                 collapsable: false,
                 children: [
                     '/guide/',
+                    '/guide/contributing'
                 ],
             },
 
