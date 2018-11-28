@@ -1,0 +1,14 @@
+{
+  "name": "Caffeinated",
+  "repository": "git@github.com:caffeinated/website.git",
+  "author": "Shea Lewis (Kai) <shea.lewis89@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs"
+  },
+  "devDependencies": {
+    "vuepress": "^0.14.8"
+  }
+}

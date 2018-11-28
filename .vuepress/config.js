@@ -22,11 +22,12 @@ module.exports = {
 
         sidebar: [
             {
-                title: 'Development',
+                title: 'Prologue',
                 collapsable: false,
                 children: [
                     '/guide/',
-                    '/guide/contributing'
+                    '/guide/codeofconduct',
+                    '/guide/contributing',
                 ],
             },
 
