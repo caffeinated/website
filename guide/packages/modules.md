@@ -189,7 +189,9 @@ php artisan make:module:provider blog PublisherServiceProvider
 Be sure to register your custom service providers within your `ModuleServiceProvider`. Refer to Laravel's service provider [documentation](https://laravel.com/docs/5.7/providers) as needed.
 :::
 
-## Publishing Resources
+## Digging Deeper
+
+### Publishing Resources
 Typically, you will need to publish your module's resources to the application's own directories. This will allow users of your module to easily override your default resources.
 
 To publish your module's resources to the application, you may call the service provider's `publishes` method within the `boot` method of your service provider. The `publishes` method accepts an array of module paths and their desired publish locations. For example, to publish a config file for your `blog` module, you may do the following:
@@ -208,14 +210,59 @@ public function boot()
 }
 ```
 
-## Locations
+### Locations
 You may configure as many locations for your modules as necessary. This is especially useful if you want to split up your "core" modules from optional "add-on" modules as an example.
 
 The location configuration is found in the `config/modules.php` file under "locations". Here you may customize locations as needed.
 
 By default, the package is configured to store and reference modules from the `app/Modules` directory.
 
-## Helpers
+### Provided Middleware
+The bundled **Identify Module** middleware provides the means to pull and store module manifest information within the session on each page load. This provides the means to identify routes from specific modules.
+
+#### Register
+Simply register as a route middleware with a short-hand key in your `app/Http/Kernel.php` file.
+
+```php
+protected $routeMiddleware = [
+    ...
+    'module' => \Caffeinated\Modules\Middleware\IdentifyModule::class,
+];
+```
+
+#### Usage
+Now, you may simply use the `middleware` key in the route options array. The **IdentifyModule** middleware expects the slug of the module to be passed along in order to locate and load the relevant manifest information.
+
+```php
+Route::group(['prefix' => 'blog', 'middleware' => ['module:blog']], function() {
+    Route::get('/', function() {
+        dd(
+            'This is the Blog module index page.',
+            session()->all()
+        );
+    });
+});
+```
+
+#### Results
+If you `dd()` your session, you'll see that you have a new `module` array key with your module's manifest information available.
+
+```
+"This is the Blog module index page."
+array:2 [▼
+  "_token" => "..."
+  "module" => array:6 [▼
+    "name" => "Blog"
+    "slug" => "blog"
+    "version" => "1.0"
+    "description" => "This is the description for the Blog module."
+    "enabled" => true
+    "order" => 9001
+  ]
+]
+```
+
+### Helpers
 Caffeinated Modules includes a handful of global "helper" PHP functions. These are used by the package itself; however, you are free to use them in your own code if you find them convenient.
 
 ---
@@ -230,14 +277,14 @@ Caffeinated Modules includes a handful of global "helper" PHP functions. These a
 
 ---
 
-### modules
+#### modules
 The `modules` function returns a collection of all modules and their accompanying manifest information.
 
 ```php
 $modules = modules();
 ```
 
-### module_path
+#### module_path
 The `module_path` function returns the fully qualified path to the specified module's directory. You may also use the `module_path` function to generate a fully qualified path to a file relative to the module:
 
 ```php
@@ -252,7 +299,7 @@ If your module is not found within your configured default location, you may pas
 $path = module_path('blog', 'Http/Controllers/BlogController.php', 'add-on');
 ```
 
-### module_class
+#### module_class
 The `module_class` function returns the full namespace path of the specified module and class.
 
 ```php
