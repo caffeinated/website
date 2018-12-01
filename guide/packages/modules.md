@@ -3,19 +3,27 @@ title: Modules
 ---
 
 # Modules
+
+<div class="badges">
+
+[![Source](https://img.shields.io/badge/source-caffeinated/modules-blue.svg?style=flat-square)](https://github.com/caffeinated/modules)
+[![Latest Stable Version](https://poser.pugx.org/caffeinated/modules/v/stable?format=flat-square)](https://packagist.org/packages/caffeinated/modules)
+[![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](https://tldrlegal.com/license/mit-license)
+[![Total Downloads](https://img.shields.io/packagist/dt/caffeinated/modules.svg?style=flat-square)](https://packagist.org/packages/caffeinated/modules)
+[![Travis (.org)](https://img.shields.io/travis/caffeinated/modules.svg?style=flat-square)](https://travis-ci.org/caffeinated/modules)
+
+</div>
+
 Extract and modularize your code for maintainability. Essentially creates "mini-laravel" structures to organize your application.
 
 [[toc]]
 
 ## Installation
-Simply install the package through Composer. From here the package will automatically register its service provider.
+Simply install the package through Composer. From here the package will automatically register its service provider and `Module` facade.
 
 ```
 composer require caffeinated/modules
 ```
-
-### Facade
-Optionally, you may also register the accompanying facade for easier access to the underlying API. Inside your project's `config/app.php` file, add the following to the array of facades:
 
 ```php
 'Module' => Caffeinated\Modules\Facades\Module::class,
@@ -37,66 +45,71 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Path to Modules
+    | Default Location
     |--------------------------------------------------------------------------
     |
-    | Define the path where you'd like to store your modules. Note that if you
-    | choose a path that's outside of your public directory, you will need to
-    | copy your module assets (CSS, images, etc.) to your public directory.
+    | This option controls the default module location that gets used while
+    | using this package. This location is used when another is not explicitly
+    | specified when exucuting a given module function or command.
     |
     */
 
-    'default_location' => 'modules',
+    'default_location' => 'app',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Locations
+    |--------------------------------------------------------------------------
+    |
+    | Here you may define all of the module locations for your application as
+    | well as their drivers and other configuration options. This gives you
+    | the flexibility to structure modules as you see fit in each location.
+    |
+    */
 
     'locations' => [
-        'modules' => [
+        'app' => [
             'driver'    => 'local',
             'path'      => app_path('Modules'),
             'namespace' => 'App\\Modules\\',
             'enabled'   => true,
+            'provider'  => 'ModuleServiceProvider',
+            'manifest'  => 'module.json',
+            'mapping'   => [
+                
+                // Here you may configure the class mapping, effectivly
+                // customizing your generated default module structure.
+
+                'Config'              => 'Config',
+                'Database/Factories'  => 'Database/Factories',
+                'Database/Migrations' => 'Database/Migrations',
+                'Database/Seeds'      => 'Database/Seeds',
+                'Http/Controllers'    => 'Http/Controllers',
+                'Http/Middleware'     => 'Http/Middleware',
+                'Providers'           => 'Providers',
+                'Resources/Lang'      => 'Resources/Lang',
+                'Resources/Views'     => 'Resources/Views',
+                'Routes'              => 'Routes'
+            ],
         ],
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Modules Default State
+    | Default Driver
     |--------------------------------------------------------------------------
     |
-    | When a previously unknown module is added, if it doesn't have an 'enabled'
-    | state set then this is the value which it will default to. If this is
-    | not provided then the module will default to being 'enabled'.
-    |
-    */
-
-    'enabled' => true,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Modules Default Service Provider class name
-    |--------------------------------------------------------------------------
-    |
-    | Define class name to use as default module service provider.
-    |
-    */
-
-    'provider_class' => 'Providers\\ModuleServiceProvider',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Default Module Driver
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify the default module storage druver that should be
+    | Here you may specify the default module storage driver that should be
     | used by the package. A "local" driver is available out of the box that
     | uses the local filesystem to store and maintain module manifests.
     |
     */
 
-    'default_default' => 'local',
+    'default_driver' => 'local',
 
     /*
      |--------------------------------------------------------------------------
-     | Module Drivers
+     | Drivers
      |--------------------------------------------------------------------------
      |
      | Here you may configure as many module drivers as you wish. Use the
@@ -107,22 +120,6 @@ return [
 
     'drivers' => [
         'local' => 'Caffeinated\Modules\Repositories\LocalRepository',
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Remap Module Subdirectories
-    |--------------------------------------------------------------------------
-    |
-    | Redefine how module directories are structured. The mapping here will
-    | be respected by all commands and generators.
-    |
-    */
-
-    'pathMap' => [
-        // To change where migrations go, specify the default
-        // location as the key and the new location as the value:
-        // 'Database/Migrations' => 'src/Database/Migrations',
     ],
 ];
 ```
@@ -149,10 +146,7 @@ One of the important files that **must** be present at the root of every module,
 	"name": "Blog",
 	"slug": "blog",
 	"version": "1.0",
-	"author": "The Doctor",
-	"license": "MIT",
 	"description": "Only the best blog module in the world!",
-	"order": 100
 }
 ```
 
@@ -161,12 +155,10 @@ One of the important files that **must** be present at the root of every module,
 | name **\*** | The human-readable name of your module. |
 | slug **\*** | The slug of your module used to reference in commands and code. |
 | version **\*** | The version of your module. |
-| author | The author of your module. |
-| license | The license that the module falls under. |
 | description **\*** | A simple description of your module. |
-| order | The order in which your module is loaded. Defaults to `9999`. |
+| order | You may also optionally pass in the order in which your module is loaded. Defaults to `9001`. |
 
-The only required properties are `name`, `slug`, `description`, and `version`. You may optionaly remove or add any other property as you see fit.
+**\*** These properties are required in every manifest.
 
 Once you've made a change to a manifest file, you will need to re-optimize your module manifest cache. You can do this by running the following Artisan command:
 
@@ -189,7 +181,100 @@ php artisan make:module:provider blog PublisherServiceProvider
 Be sure to register your custom service providers within your `ModuleServiceProvider`. Refer to Laravel's service provider [documentation](https://laravel.com/docs/5.7/providers) as needed.
 :::
 
+### Migrations
+We've extended Laravel's migrations system to make it easier to work with migrations for your modules. Particularly, you're able to run, rollback, reset, and refresh migrations for individual modules separate from your application (or other modules). This makes it super easy to work with modules during development.
+
+#### Generating Migrations
+To create a module migration, use the `make:module:migration` Artisan command:
+
+```
+php artisan make:module:migration blog create_posts_table
+```
+
+The new migration will be placed in your defined migrations directory (by default this is `Database/Migrations`). Migrations follow the same workflow and structure as any other Laravel migration, so be sure to check out the documention on them [here](https://laravel.com/docs/5.7/migrations) for reference.
+
+#### Running Migrations
+To run all of your outstanding module migrations, execute the `module:migrate` Artisan command:
+
+```
+php artisan module:migrate
+```
+
+You may optionally specificy the exact module you'd like to run migrations against by passing through the slug:
+
+```
+php artisan module:migrate blog
+```
+
+Lastly, every module migrate command accepts the use of the `--location` flag to specify which module location to target.
+
+#### Rolling Back Migrations
+To rollback the latest migration operation, you use the `module:migrate:rollback` command.
+
+```
+php artisan module:migrate:rollback
+```
+
+The rollback command also supports the `step` option to rollback a certain number of migrations:
+
+```
+php artisan module:migrate:rollback --step=5
+```
+
+You may also specify the module you wish to rollback, specifically:
+
+```
+php artisan module:migrate:rollback blog
+```
+
+The `module:migrate:reset` command will roll back all of your module migrations or the migrations of the module you pass through:
+
+```
+php artisan module:migrate:reset
+
+php artisan module:migrate:reset blog
+```
+
+### Enabling Modules
+Modules may be enabled either through the `module:enable` artisan command or through the facade with `enable()`:
+
+```
+php artisan module:enable blog
+```
+
+```php
+Module::enable('blog');
+```
+
+### Disabling Modules
+Modules may be disabled either through the `module:disable` artisan command or through the facade with `disable()`:
+
+```
+php artisan module:disable blog
+```
+
+```php
+Module::disable('blog');
+```
+
 ## Digging Deeper
+
+### Locations
+You may configure as many locations for your modules as necessary. For example, you may to split up your "core" modules from optional "add-on" modules.
+
+The location configuration is found in the `config/modules.php` file under "locations". Here you may customize locations as needed. By default, the package is configured to store and reference modules from the `app/Modules` directory.
+
+Each location may have its own configuration options on how you'd like to structure your modules:
+
+| Property | Description |
+|----------|-------------|
+| driver | The module driver to use for this location. |
+| path | The root path where you wish to store modules for this location. |
+| namespace | The root namespace used when generating modules for this location. |
+| enabled | Whether or not modules are enabled by default or not in this location. |
+| provider | The master provider class name for modules in this location. |
+| manifest | The manifest filename for modules in this location. Must be a JSON file. |
+| mapping | The custom mapping of directories for modules in this location. |
 
 ### Publishing Resources
 Typically, you will need to publish your module's resources to the application's own directories. This will allow users of your module to easily override your default resources.
@@ -209,13 +294,6 @@ public function boot()
     ]);
 }
 ```
-
-### Locations
-You may configure as many locations for your modules as necessary. This is especially useful if you want to split up your "core" modules from optional "add-on" modules as an example.
-
-The location configuration is found in the `config/modules.php` file under "locations". Here you may customize locations as needed.
-
-By default, the package is configured to store and reference modules from the `app/Modules` directory.
 
 ### Provided Middleware
 The bundled **Identify Module** middleware provides the means to pull and store module manifest information within the session on each page load. This provides the means to identify routes from specific modules.
@@ -310,4 +388,147 @@ If your module is not found within your configured default location, you may pas
 
 ```php
 $namespace = module_class('blog', 'Http\Controllers\BlogController', 'add-on');
+```
+
+## API Reference
+
+<div class="collection-method-list">
+
+[all](#all)
+[slugs](#slugs)
+[where](#where)
+[sortBy](#sortby)
+[sortByDesc](#sortbydesc)
+[exists](#exists)
+[count](#count)
+[getManifest](#getmanifest)
+[get](#get)
+[set](#set)
+[enabled](#enabled)
+[disabled](#disabled)
+[isEnabled](#isenabled)
+[isDisabled](#isdisabled)
+[enable](#enable)
+[disable](#disable)
+
+</div>
+
+---
+
+### all
+Get all modules, returned as a `Collection`.
+
+```php
+$modules = Module::all();
+```
+
+### slugs
+Get all modules, returned as a `Collection`.
+
+```php
+$modules = Module::slugs();
+```
+
+### where
+Find a module based on a where clause, returns a `Collection`.
+
+```php
+$blogModule = Module::where('slug', 'blog');
+```
+
+### sortBy
+Get all modules sorted by key in ascending order, returned as a `Collection`.
+
+```php
+$modules = Module::sortBy('name');
+```
+
+### sortByDesc
+Get all modules sorted by key in descending order, returned as a `Collection`.
+
+```php
+$modules = Module::sortByDesc('name');
+```
+
+### exists
+Check if given module exists, returns a `Boolean`.
+
+```php
+if (Module::exists('blog')) {
+    // Do something with it
+}
+```
+
+### count
+Returns a count of all modules.
+
+```php
+$count = Module::count();
+```
+
+### getManifest
+Get a module's manifest contents, returned as a `Collection`.
+
+```php
+$manifest = Module::getManifest('blog');
+```
+
+### get
+Returns the given module manifest property value. If a value is not found, you may define a default value as the second parameter.
+
+```php
+$name = Module::get('blog::post_limit', 15);
+```
+
+### set
+Set the given module manifest property value.
+
+```php
+Module::get('blod::description', 'This is a fresh new description of the blog module.');
+```
+
+### enabled
+Gets all enabled modules, returned as a `Collection`.
+
+```php
+$enabled = Module::enabled();
+```
+
+### disabled
+Gets all disabled modules, returned as a `Collection`.
+
+```php
+$disabled = Module::disabled();
+```
+
+### isEnabled
+Checks if the given module is enabled, returns a `Boolean`.
+
+```php
+if (Module::isEnabled('blog')) {
+    // Do something
+}
+```
+
+### isDisabled
+Checks if the given module is disabled, returns a `Boolean`.
+
+```php
+if (Module::isDisabled('blog')) {
+    // Do something
+}
+```
+
+### enable
+Enable the given module.
+
+```php
+Module::enable('blog');
+```
+
+### disable
+Disable the given module.
+
+```php
+Module::disable('blog);
 ```

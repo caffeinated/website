@@ -1,6 +1,7 @@
 module.exports = {
     title: 'Caffeinated',
     description: 'A series of Laravel packages',
+    ga: 'UA-55914671-3',
 
     themeConfig: {
         repo: 'caffeinated/website',
