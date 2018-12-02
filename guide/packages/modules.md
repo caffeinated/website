@@ -484,7 +484,7 @@ $name = Module::get('blog::post_limit', 15);
 Set the given module manifest property value.
 
 ```php
-Module::get('blod::description', 'This is a fresh new description of the blog module.');
+Module::get('blog::description', 'This is a fresh new description of the blog module.');
 ```
 
 ### enabled
