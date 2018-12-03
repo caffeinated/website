@@ -40,5 +40,7 @@ module.exports = {
                 ],
             },
         ]
-    }
+    },
+
+    plugins: ['@vuepress/google-analytics'],
 }
