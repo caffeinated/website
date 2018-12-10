@@ -25,10 +25,6 @@ Simply install the package through Composer. From here the package will automati
 composer require caffeinated/modules
 ```
 
-```php
-'Module' => Caffeinated\Modules\Facades\Module::class,
-```
-
 ### Config
 To publish the config file, run the following:
 

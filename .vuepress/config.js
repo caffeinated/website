@@ -16,6 +16,7 @@ module.exports = {
             {
                 text: 'Packages',
                 items: [
+                    { text: 'Bonsai', link: '/guide/packages/bonsai' },
                     { text: 'Modules', link: '/guide/packages/modules' },
                 ]
             }
@@ -36,6 +37,7 @@ module.exports = {
                 title: 'Packages',
                 collapsable: false,
                 children: [
+                    '/guide/packages/bonsai',
                     '/guide/packages/modules',
                 ],
             },
