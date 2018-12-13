@@ -18,6 +18,7 @@ module.exports = {
                 items: [
                     { text: 'Bonsai', link: '/guide/packages/bonsai' },
                     { text: 'Modules', link: '/guide/packages/modules' },
+                    { text: 'Themes', link: '/guide/packages/themes' },
                 ]
             }
         ],
@@ -39,6 +40,7 @@ module.exports = {
                 children: [
                     '/guide/packages/bonsai',
                     '/guide/packages/modules',
+                    '/guide/packages/themes',
                 ],
             },
         ]
