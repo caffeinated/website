@@ -40,18 +40,6 @@ return [
 
 	/*
 	|--------------------------------------------------------------------------
-	| Theme Path
-	|--------------------------------------------------------------------------
-	|
-	| Define the path where your themes will reside. By default we will assign
-	| themes to live at base of your Laravel application. Because themes
-	| can extend Laravel, this makes the most sense as the default.
-	*/
-
-	'path' => base_path('themes'),
-
-	/*
-	|--------------------------------------------------------------------------
 	| Default Active Theme
 	|--------------------------------------------------------------------------
 	|
@@ -128,6 +116,9 @@ One of the important files that **must** be present at the root of every theme, 
 
 **\*** These properties are required in every manifest.
 
+### Autoloading
+When activating your theme, we will automatically register a PSR-4 reference to your theme for you. This ensures a smooth experience during development. And don't worry, we won't re-register your theme if your theme has been installed through Composer - that'd be just silly.
+
 ### Service Providers
 One of the cool things about themes, is their ability to provide their own set of resources and routes to your application. This is great for one-off application needs that may be tied directly to your theme. Keeps all the logic contained without muddying up your main application.
 
@@ -136,6 +127,26 @@ A `ThemeServiceProvider` and `RouteServiceProvider` is provided out of the box. 
 ::: tip NOTE
 Be sure to register your custom service providers within your `ThemeServiceProvider`. Refer to Laravel's service provider [documentation](https://laravel.com/docs/5.7/providers) as needed.
 :::
+
+## Helpers
+Caffeinated Themes includes a global "helper" PHP function. This is used by the package itself; however, you are free to use it in your own code if you find it convenient.
+
+---
+
+<div class="collection-method-list">
+
+[theme_path](#theme-path)
+
+</div>
+
+### theme_path
+The `theme_path` function returns the fully qualified path to either the currently active or specified theme's directory (passed via the second parameter).
+
+```php
+$path = theme_path('resources/js/bootstrap.js');
+
+$path = theme_path('resources/js/bootstrap.js', 'bootstrap');
+```
 
 ## API Reference
 The base theme class is actually an extension of Laravel's Collection class. So, by proxy you will have access to all the methods provided by [Collections](https://laravel.com/docs/5.7/collections) as well as the additions outlined below.
