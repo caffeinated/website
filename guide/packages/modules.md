@@ -526,5 +526,5 @@ Module::enable('blog');
 Disable the given module.
 
 ```php
-Module::disable('blog);
+Module::disable('blog');
 ```
