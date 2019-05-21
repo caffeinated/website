@@ -73,7 +73,7 @@ return [
             'manifest'  => 'module.json',
             'mapping'   => [
                 
-                // Here you may configure the class mapping, effectivly
+                // Here you may configure the class mapping, effectively
                 // customizing your generated default module structure.
 
                 'Config'              => 'Config',
@@ -480,7 +480,7 @@ $name = Module::get('blog::post_limit', 15);
 Set the given module manifest property value.
 
 ```php
-Module::get('blod::description', 'This is a fresh new description of the blog module.');
+Module::get('blog::description', 'This is a fresh new description of the blog module.');
 ```
 
 ### enabled
