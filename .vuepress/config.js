@@ -18,6 +18,7 @@ module.exports = {
                 items: [
                     { text: 'Bonsai', link: '/guide/packages/bonsai' },
                     { text: 'Modules', link: '/guide/packages/modules' },
+                    { text: 'Shinobi', link: '/guide/packages/shinobi' },
                     { text: 'Themes', link: '/guide/packages/themes' },
                 ]
             }
@@ -40,6 +41,7 @@ module.exports = {
                 children: [
                     '/guide/packages/bonsai',
                     '/guide/packages/modules',
+                    '/guide/packages/shinobi',
                     '/guide/packages/themes',
                 ],
             },
