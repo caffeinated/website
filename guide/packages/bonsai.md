@@ -27,7 +27,7 @@ composer require caffeinated/bonsai
 ```
 
 ## Basic Usage
-First, plant your bonsai. You may optionally register assets during this time as well.
+First, plant your bonsai, you can use view composer. You may optionally register assets during this time as well.
 
 ```php
 Bonsai::plant(function($asset) {
@@ -43,6 +43,24 @@ Now, to add assets at anytime (and anywhere in your code), simply call `Bonsai:a
 
 ```php
 Bonsai::add('assets/css/example.css');
+```
+
+Also, you can use json files
+
+```php
+Bonsai::add('assets/json/main.bonsai.json'); 		// extension must be ".bonsai.json"
+```
+
+The above json file may content:
+
+```json
+{
+    "assets/css/bootstrap.css":{"namespace":"bootstrap"},
+    "assets/css/test.css":{"dependency":"bootstrap"},
+    "assets/css/example.css":{},
+    "assets/js/jquery.js":{"namespace":"jquery"},
+    "assets/js/bootstrap.js":{"namespace":"bootstrap","dependency":"jquery"}
+}
 ```
 
 ## Defining Dependencies
